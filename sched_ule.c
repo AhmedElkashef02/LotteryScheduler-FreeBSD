@@ -446,9 +446,14 @@ sched_shouldpreempt(int pri, int cpri, int remote)
 }
 
 /*
+ * if it is a root process:
  * Add a thread to the actual run-queue.  Keeps transferable counts up to
  * date with what is actually on the run-queue.  Selects the correct
  * queue position for timeshare threads.
+ *
+ * if it is a user process:
+ * give each thead 500 tickets and sit ticketed to true if it's not.
+ * put it in the right queue.
  */
 static __inline void
 tdq_runq_add(struct tdq *tdq, struct thread *td, int flags)
@@ -466,34 +471,66 @@ tdq_runq_add(struct tdq *tdq, struct thread *td, int flags)
 		tdq->tdq_transferable++;
 		ts->ts_flags |= TSF_XFERABLE;
 	}
-	if (pri < PRI_MIN_BATCH) {
-		ts->ts_runq = &tdq->tdq_realtime;
-	} else if (pri <= PRI_MAX_BATCH) {
-		ts->ts_runq = &tdq->tdq_timeshare;
-		KASSERT(pri <= PRI_MAX_BATCH && pri >= PRI_MIN_BATCH,
-			("Invalid priority %d on timeshare runq", pri));
-		/*
-		 * This queue contains only priorities between MIN and MAX
-		 * realtime.  Use the whole queue to represent these values.
-		 */
-		if ((flags & (SRQ_BORROWING|SRQ_PREEMPTED)) == 0) {
-			pri = RQ_NQS * (pri - PRI_MIN_BATCH) / PRI_BATCH_RANGE;
-			pri = (pri + tdq->tdq_idx) % RQ_NQS;
+	/* checks if it's a root process or not */
+	sys_getuid(td, 0);
+	/* if root process */
+	if (td->td_retval[0] == 0) {
+		if (pri < PRI_MIN_BATCH) {
+			ts->ts_runq = &tdq->tdq_realtime;
+		} else if (pri <= PRI_MAX_BATCH) {
+			ts->ts_runq = &tdq->tdq_timeshare;
+			KASSERT(pri <= PRI_MAX_BATCH && pri >= PRI_MIN_BATCH,
+				("Invalid priority %d on timeshare runq", pri));
 			/*
-			 * This effectively shortens the queue by one so we
-			 * can have a one slot difference between idx and
-			 * ridx while we wait for threads to drain.
+			 * This queue contains only priorities between MIN and MAX
+			 * realtime.  Use the whole queue to represent these values.
 			 */
-			if (tdq->tdq_ridx != tdq->tdq_idx &&
-			    pri == tdq->tdq_ridx)
-				pri = (unsigned char)(pri - 1) % RQ_NQS;
-		} else
-			pri = tdq->tdq_ridx;
-		runq_add_pri(ts->ts_runq, td, pri, flags);
-		return;
-	} else
-		ts->ts_runq = &tdq->tdq_idle;
-	runq_add(ts->ts_runq, td, flags);
+			if ((flags & (SRQ_BORROWING|SRQ_PREEMPTED)) == 0) {
+				pri = RQ_NQS * (pri - PRI_MIN_BATCH) / PRI_BATCH_RANGE;
+				pri = (pri + tdq->tdq_idx) % RQ_NQS;
+				/*
+				 * This effectively shortens the queue by one so we
+				 * can have a one slot difference between idx and
+				 * ridx while we wait for threads to drain.
+				 */
+				if (tdq->tdq_ridx != tdq->tdq_idx &&
+				    pri == tdq->tdq_ridx)
+					pri = (unsigned char)(pri - 1) % RQ_NQS;
+			} else
+				pri = tdq->tdq_ridx;
+			runq_add_pri(ts->ts_runq, td, pri, flags);
+			return;
+		} else {
+			ts->ts_runq = &tdq->tdq_idle;
+		}
+		runq_add(ts->ts_runq, td, flags);
+	}
+	/* if user process:
+	* give each thead 500 tickets and sit ticketed to true.
+	* If it is a realtime thread -> assign it to the same realtime queue.
+	* If its a timeshare thread -> put it in a special timeshare queue for user processes only.
+	* If it's not any of them -> put it in the idle queue.
+	*/
+	else {
+		if (!td->ticketed){
+			td->tickets = 500;
+			td->ticketed = true;
+		}
+		if (pri < PRI_MIN_BATCH) {
+			//if realtime
+			ts->ts_runq = &tdq->tdq_realtime;
+		}else if (pri <= PRI_MAX_BATCH) {
+			//if timeshare
+			ts->ts_runq = &tdq->tdq_timeshare_user;
+			runq_lottery_add(ts->ts_runq, td);
+			return;
+			}
+		else {
+			//if idle
+			ts->ts_runq = &tdq->tdq_idle;
+		}
+		runq_add(ts->ts_runq, td, flags);
+	}
 }
 
 /* 
