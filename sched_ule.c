@@ -1345,9 +1345,11 @@ tdq_choose(struct tdq *tdq)
 	struct thread *td;
 
 	TDQ_LOCK_ASSERT(tdq, MA_OWNED);
+	/* choose from realtime threads */
 	td = runq_choose(&tdq->tdq_realtime);
 	if (td != NULL)
 		return (td);
+	/* choose from timeshare threads */
 	td = runq_choose_from(&tdq->tdq_timeshare, tdq->tdq_ridx);
 	if (td != NULL) {
 		KASSERT(td->td_priority >= PRI_MIN_BATCH,
@@ -1355,6 +1357,7 @@ tdq_choose(struct tdq *tdq)
 		    td->td_priority));
 		return (td);
 	}
+	/* choose from idle threads */
 	td = runq_choose(&tdq->tdq_idle);
 	if (td != NULL) {
 		KASSERT(td->td_priority >= PRI_MIN_IDLE,
@@ -1362,7 +1365,11 @@ tdq_choose(struct tdq *tdq)
 		    td->td_priority));
 		return (td);
 	}
-
+	/* choose from timeshare threads - lottery */
+	td = runq_choose_lotterysched(&tdq->tdq_timeshare_user);
+	if (td != NULL) {
+		return (td);
+	}
 	return (NULL);
 }
 
