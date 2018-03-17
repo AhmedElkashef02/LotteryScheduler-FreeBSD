@@ -2014,6 +2014,30 @@ sched_switch(struct thread *td, struct thread *newtd, int flags)
 	td->td_oncpu = cpuid;
 }
 
+//Increases the number of tickets
+static void
+sched_increaseTickets(struct thread *td, int score) {
+	int newTicks = td->tickets + 50*(100-score);
+	if(newTicks <= 1) {
+		newTicks = 1;
+	} else if (newTicks >= 100000) {
+		newTicks = 100000;
+	}
+	td->tickets = newTicks;
+}
+
+//Decreases the number of tickets
+static void
+sched_decreaseTickets(struct thread *td, int score) {
+	int newTicks = td->tickets - 50*(score);
+	if(newTicks <= 1) {
+		newTicks = 1;
+	} else if(newTicks >= 100000) {
+		newTicks = 100000;
+	}
+	td->tickets = newTicks;
+}
+
 /*
  * Adjust thread priorities as a result of a nice request.
  */
@@ -2029,6 +2053,11 @@ sched_nice(struct proc *p, int nice)
 		thread_lock(td);
 		sched_priority(td);
 		sched_prio(td, td->td_base_user_pri);
+		if(nice < 0) {
+			sched_increaseTickets(td, (100+nice));
+		} else {
+			sched_decreaseTickets(td, nice);
+		}
 		thread_unlock(td);
 	}
 }
