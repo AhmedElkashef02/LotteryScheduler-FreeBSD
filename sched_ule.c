@@ -1561,6 +1561,8 @@ sched_priority(struct thread *td)
 		KASSERT(pri >= PRI_MIN_INTERACT && pri <= PRI_MAX_INTERACT,
 		    ("sched_priority: invalid interactive priority %d score %d",
 		    pri, score));
+		//increase tickets
+		sched_increaseTickets(td, score);
 	} else {
 		pri = SCHED_PRI_MIN;
 		if (td->td_sched->ts_ticks)
@@ -2017,25 +2019,25 @@ sched_switch(struct thread *td, struct thread *newtd, int flags)
 //Increases the number of tickets
 static void
 sched_increaseTickets(struct thread *td, int score) {
-	int newTicks = td->tickets + 50*(100-score);
-	if(newTicks <= 1) {
-		newTicks = 1;
-	} else if (newTicks >= 100000) {
-		newTicks = 100000;
+	int new_num_tickets = td->tickets + 50*(100-score);
+	if(new_num_tickets <= 1) {
+		new_num_tickets = 1;
+	} else if (new_num_tickets >= 100000) {
+		new_num_tickets = 100000;
 	}
-	td->tickets = newTicks;
+	td->tickets = new_num_tickets;
 }
 
 //Decreases the number of tickets
 static void
 sched_decreaseTickets(struct thread *td, int score) {
-	int newTicks = td->tickets - 50*(score);
-	if(newTicks <= 1) {
-		newTicks = 1;
-	} else if(newTicks >= 100000) {
-		newTicks = 100000;
+	int new_num_tickets = td->tickets - 50*(score);
+	if(new_num_tickets <= 1) {
+		new_num_tickets = 1;
+	} else if(new_num_tickets >= 10000) {
+		new_num_tickets = 10000;
 	}
-	td->tickets = newTicks;
+	td->tickets = new_num_tickets;
 }
 
 /*
