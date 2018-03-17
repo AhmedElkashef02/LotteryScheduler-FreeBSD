@@ -246,6 +246,9 @@ struct tdq {
 	struct runq	tdq_realtime;		/* real-time run queue. */
 	struct runq	tdq_timeshare;		/* timeshare run queue. */
 	struct runq	tdq_idle;		/* Queue of IDLE threads. */
+	struct runq tdq_interactive_user;	/* Interactive non-root threads */
+	struct runq tdq_timeshare_user;		/* Timeshare non-root threads */
+	struct runq tdq_idle_user;		/* Queue of IDLE non-root threads */
 	char		tdq_name[TDQ_NAME_LEN];
 #ifdef KTR
 	char		tdq_loadname[TDQ_LOADNAME_LEN];
