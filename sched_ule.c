@@ -1369,7 +1369,7 @@ tdq_choose(struct tdq *tdq)
 		return (td);
 	}
 	/* choose from timeshare threads - lottery */
-	td = runq_choose_lotterysched(&tdq->tdq_timeshare_user);
+	td = runq_choose_from_lottery(&tdq->tdq_timeshare_user);
 	if (td != NULL) {
 		return (td);
 	}
