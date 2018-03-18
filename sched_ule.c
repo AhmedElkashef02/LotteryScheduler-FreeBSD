@@ -1528,6 +1528,30 @@ sched_interact_score(struct thread *td)
 
 }
 
+//Increases the number of tickets
+static void
+sched_increaseTickets(struct thread *td, int score) {
+	int new_num_tickets = td->tickets + 50*(100-score);
+	if(new_num_tickets <= 1) {
+		new_num_tickets = 1;
+	} else if (new_num_tickets >= 100000) {
+		new_num_tickets = 100000;
+	}
+	td->tickets = new_num_tickets;
+}
+
+//Decreases the number of tickets
+static void
+sched_decreaseTickets(struct thread *td, int score) {
+	int new_num_tickets = td->tickets - 50*(score);
+	if(new_num_tickets <= 1) {
+		new_num_tickets = 1;
+	} else if(new_num_tickets >= 10000) {
+		new_num_tickets = 10000;
+	}
+	td->tickets = new_num_tickets;
+}
+
 /*
  * Scale the scheduling priority according to the "interactivity" of this
  * process.
@@ -2014,30 +2038,6 @@ sched_switch(struct thread *td, struct thread *newtd, int flags)
 	TDQ_LOCK_ASSERT(tdq, MA_OWNED|MA_NOTRECURSED);
 	MPASS(td->td_lock == TDQ_LOCKPTR(tdq));
 	td->td_oncpu = cpuid;
-}
-
-//Increases the number of tickets
-static void
-sched_increaseTickets(struct thread *td, int score) {
-	int new_num_tickets = td->tickets + 50*(100-score);
-	if(new_num_tickets <= 1) {
-		new_num_tickets = 1;
-	} else if (new_num_tickets >= 100000) {
-		new_num_tickets = 100000;
-	}
-	td->tickets = new_num_tickets;
-}
-
-//Decreases the number of tickets
-static void
-sched_decreaseTickets(struct thread *td, int score) {
-	int new_num_tickets = td->tickets - 50*(score);
-	if(new_num_tickets <= 1) {
-		new_num_tickets = 1;
-	} else if(new_num_tickets >= 10000) {
-		new_num_tickets = 10000;
-	}
-	td->tickets = new_num_tickets;
 }
 
 /*
