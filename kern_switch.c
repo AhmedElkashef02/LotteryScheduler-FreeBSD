@@ -353,6 +353,52 @@ runq_add(struct runq *rq, struct thread *td, int flags)
 	}
 }
 
+/* add to the lottery schedule */
+void
+runq_add_to_lottery(struct runq *rq, struct thread *td) {
+	struct rqhead *rqh;
+	int pri = 1;
+	td->td_rqindex = pri;
+	runq_setbit(rq, pri);
+	rqh = &rq->rq_queues[pri];
+	
+	printf("LOTTERYADDING++++++++++++++%d\n", td->tickets);
+	
+	TAILQ_INSERT_TAIL(rqh, td, td_runq);
+}
+
+/* choose from lottery scheduler */
+struct thread *
+runq_choose_from_lottery(struct runq *rq) {
+	struct rqhead *rqh;
+	struct thread *td;
+	int pri = 1;
+	uint32_t winner = 0;
+	uint32_t total_tickets = 0;
+	uint32_t ticket_counter = 0;
+
+	rqh = &rq->rq_queues[pri];
+
+	
+	TAILQ_FOREACH(td, rqh, td_runq){
+		total_tickets += td->tickets;
+	}
+	printf("%d_************************LOTTERYCHOOSE\n", total_tickets);
+
+	/* draw a random ticket and decide a winner, choose that thread */
+	winner = (uint32_t)random();
+	winner = winner % (total_tickets + 1);
+
+	
+	TAILQ_FOREACH(td, rqh, td_runq){
+		if (ticket_counter >= winner)
+			return (td);
+		ticket_counter += td->tickets;
+	}
+	
+	return (NULL);
+}
+
 void
 runq_add_pri(struct runq *rq, struct thread *td, u_char pri, int flags)
 {
