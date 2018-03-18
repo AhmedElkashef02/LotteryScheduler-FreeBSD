@@ -62,13 +62,15 @@ struct runq {
 	struct	rqhead rq_queues[RQ_NQS];
 };
 
+void 	runq_add_to_lottery(struct runq *, struct thread *);
+struct  thread  *runq_choose_from_lottery(struct runq *rq);
 void	runq_add(struct runq *, struct thread *, int);
 void	runq_add_pri(struct runq *, struct thread *, u_char, int);
 int	runq_check(struct runq *);
 struct	thread *runq_choose(struct runq *);
 struct	thread *runq_choose_from(struct runq *, u_char);
 struct	thread *runq_choose_fuzz(struct runq *, int);
-struct	thread *runq_choose_lotterysched(struct runq *rq);
+//struct	thread *runq_choose_lotterysched(struct runq *rq);
 void	runq_init(struct runq *);
 void	runq_remove(struct runq *, struct thread *);
 void	runq_remove_idx(struct runq *, struct thread *, u_char *);
