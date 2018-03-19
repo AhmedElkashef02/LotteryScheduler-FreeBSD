@@ -525,7 +525,7 @@ tdq_runq_add(struct tdq *tdq, struct thread *td, int flags)
 		}else if (pri <= PRI_MAX_BATCH) {
 			//if timeshare
 			ts->ts_runq = &tdq->tdq_timeshare_user;
-			runq_lottery_add(ts->ts_runq, td);
+			runq_add_to_lottery(ts->ts_runq, td);
 			return;
 			}
 		else {
