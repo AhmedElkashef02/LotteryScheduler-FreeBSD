@@ -1532,11 +1532,20 @@ sched_interact_score(struct thread *td)
 static void
 sched_increaseTickets(struct thread *td, int score) {
 	struct proc *p = td->td_proc;
+	/* calculate the tickets per thread */
+	/*int tickets_per_thread = p->total_tickets / p->p_exitthreads;
+	if (p->total_tickets % p->p_exitthreads != 0) {
+		tickets_per_thread += p->total_tickets % p->p_exitthreads;
+	} */
 	int new_num_tickets = td->tickets + 1;
 	if(new_num_tickets <= 1) {
 		new_num_tickets = 1;
+		/* reject the change and re-add the ticket to total */
+		p->total_tickets++;
 	} else if (new_num_tickets >= 100000) {
 		new_num_tickets = 100000;
+		/* reject the change and re-subtract the ticket to total */
+		p->total_tickets--;
 	}
 	td->tickets = new_num_tickets;
 }
@@ -1548,8 +1557,12 @@ sched_decreaseTickets(struct thread *td, int score) {
 	int new_num_tickets = td->tickets - 1;
 	if(new_num_tickets <= 1) {
 		new_num_tickets = 1;
-	} else if(new_num_tickets >= 10000) {
-		new_num_tickets = 10000;
+		/* reject the change and re-add the ticket to total */
+		p->total_tickets++;
+	} else if(new_num_tickets >= 100000) {
+		new_num_tickets = 100000;
+		/* reject the change and re-subtract the ticket to total */
+		p->total_tickets--;
 	}
 	td->tickets = new_num_tickets;
 }
