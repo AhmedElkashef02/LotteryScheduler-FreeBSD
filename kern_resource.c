@@ -279,9 +279,11 @@ PRIV_SCHED_SETPRIORITY) != 0)
 		sched_nice(p, n);
 	}
 	else {
-	   printf("number of tickets BEFORE nice: %d", td->tickets);
+	   printf("number of nice BEFORE nice: %d\n", n);
+	   printf("number of tickets BEFORE nice: %d\n", td->tickets);
 	   sched_nice(p, n);
-	   printf("number of tickets AFTER nice: %d", td->tickets);
+	   printf("number of nice AFTER nice: %d\n", n);
+	   printf("number of tickets AFTER nice: %d\n", td->tickets);
 	}
 	return (0);
 }
