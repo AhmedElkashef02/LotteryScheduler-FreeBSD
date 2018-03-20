@@ -1530,7 +1530,8 @@ sched_interact_score(struct thread *td)
 
 //Increases the number of tickets
 static void
-sched_increaseTickets(struct thread *td, struct proc *p, int score) {
+sched_increaseTickets(struct thread *td, int score) {
+	struct proc *p = td->td_proc;
 	int new_num_tickets = td->tickets + 1;
 	if(new_num_tickets <= 1) {
 		new_num_tickets = 1;
@@ -1542,7 +1543,8 @@ sched_increaseTickets(struct thread *td, struct proc *p, int score) {
 
 //Decreases the number of tickets
 static void
-sched_decreaseTickets(struct thread *td, struct proc *p, int score) {
+sched_decreaseTickets(struct thread *td, int score) {
+	struct proc *p = td->td_proc;
 	int new_num_tickets = td->tickets - 1;
 	if(new_num_tickets <= 1) {
 		new_num_tickets = 1;
@@ -2056,9 +2058,9 @@ sched_nice(struct proc *p, int nice)
 		sched_priority(td);
 		sched_prio(td, td->td_base_user_pri);
 		if(nice < 0) {
-			sched_increaseTickets(td, p, (100+nice));
+			sched_increaseTickets(td, nice);
 		} else {
-			sched_decreaseTickets(td, p, nice);
+			sched_decreaseTickets(td, nice);
 		}
 		thread_unlock(td);
 	}
