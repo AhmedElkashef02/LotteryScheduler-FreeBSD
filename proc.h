@@ -490,6 +490,7 @@ do {									\
  * Process structure.
  */
 struct proc {
+	int total_tickets /* total number of tickets */
 	LIST_ENTRY(proc) p_list;	/* (d) List of all processes. */
 	TAILQ_HEAD(, thread) p_threads;	/* (c) all threads. */
 	struct mtx	p_slock;	/* process spin lock */
