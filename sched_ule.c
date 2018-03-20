@@ -1532,7 +1532,7 @@ sched_interact_score(struct thread *td)
 static void
 sched_increaseTickets(struct thread *td, int score) {
 	struct proc *p = td->td_proc;
-	int new_num_tickets;
+	int new_num_tickets = 0;
 	
 	/* don't excede the 100,000 tickets */
 	if ( p->total_tickets + score <= 100000 ) {
@@ -1552,7 +1552,7 @@ sched_increaseTickets(struct thread *td, int score) {
 static void
 sched_decreaseTickets(struct thread *td, int score) {
 	struct proc *p = td->td_proc;
-	int new_num_tickets;
+	int new_num_tickets = 0;
 	
 	/* don't go below the 1 ticket */
 	if ( p->total_tickets - score >= 1 ) {
