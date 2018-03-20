@@ -2063,6 +2063,8 @@ sched_nice(struct proc *p, int nice)
 {
 	struct thread *td;
 
+	printf("This is the value of nice from inside sched_nice: %d\n",nice);
+	
 	PROC_LOCK_ASSERT(p, MA_OWNED);
 
 	p->p_nice = nice;
