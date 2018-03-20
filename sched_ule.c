@@ -2065,20 +2065,34 @@ sched_nice(struct proc *p, int nice)
 
 	printf("This is the value of nice from inside sched_nice: %d\n",nice);
 	
-	PROC_LOCK_ASSERT(p, MA_OWNED);
+	sys_getuid(td, 0);
+	/* if it's a root process */
+	if (td->td_retval[0] == 0) {
+		PROC_LOCK_ASSERT(p, MA_OWNED);
 
-	p->p_nice = nice;
-	FOREACH_THREAD_IN_PROC(p, td) {
-		thread_lock(td);
-		sched_priority(td);
-		sched_prio(td, td->td_base_user_pri);
+		p->p_nice = nice;
+		FOREACH_THREAD_IN_PROC(p, td) {
+			thread_lock(td);
+			sched_priority(td);
+			sched_prio(td, td->td_base_user_pri);
+			if(nice < 0) {
+				sched_increaseTickets(td, nice);
+			} else {
+				sched_decreaseTickets(td, nice);
+			}
+			thread_unlock(td);
+		}	
+	}
+	/* if it's a user process */
+	else {
 		if(nice < 0) {
 			sched_increaseTickets(td, nice);
 		} else {
 			sched_decreaseTickets(td, nice);
-		}
-		thread_unlock(td);
+		}	
 	}
+	
+	
 }
 
 /*
