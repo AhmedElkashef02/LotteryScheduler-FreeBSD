@@ -2076,11 +2076,6 @@ sched_nice(struct proc *p, int nice)
 			thread_lock(td);
 			sched_priority(td);
 			sched_prio(td, td->td_base_user_pri);
-			if(nice < 0) {
-				sched_increaseTickets(td, nice);
-			} else {
-				sched_decreaseTickets(td, nice);
-			}
 			thread_unlock(td);
 		}	
 	}
