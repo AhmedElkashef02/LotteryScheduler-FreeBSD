@@ -362,8 +362,6 @@ runq_add_to_lottery(struct runq *rq, struct thread *td) {
 	runq_setbit(rq, pri);
 	rqh = &rq->rq_queues[pri];
 	
-	printf("LOTTERYADDING++++++++++++++%d\n", td->tickets);
-	
 	TAILQ_INSERT_TAIL(rqh, td, td_runq);
 }
 
@@ -383,7 +381,6 @@ runq_choose_from_lottery(struct runq *rq) {
 	TAILQ_FOREACH(td, rqh, td_runq){
 		total_tickets += td->tickets;
 	}
-	printf("%d_************************LOTTERYCHOOSE\n", total_tickets);
 
 	/* draw a random ticket and decide a winner, choose that thread */
 	winner = (uint32_t)random();
