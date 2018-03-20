@@ -1530,14 +1530,8 @@ sched_interact_score(struct thread *td)
 
 //Increases the number of tickets
 static void
-sched_increaseTickets(struct thread *td, struct proc *p, int score) {
-	// if the process total tickets is less than 100,000
-	// add tickets
-	// how to know much tickets to take?
-	// update the total number of tickets
-	
-	//int new_num_tickets = td->tickets + 50*(100-score);
-	int new_num_tickets = td->tickets + 1;
+sched_increaseTickets(struct thread *td, int score) {
+	int new_num_tickets = td->tickets + 50*(100-score);
 	if(new_num_tickets <= 1) {
 		new_num_tickets = 1;
 	} else if (new_num_tickets >= 100000) {
@@ -1548,14 +1542,12 @@ sched_increaseTickets(struct thread *td, struct proc *p, int score) {
 
 //Decreases the number of tickets
 static void
-sched_decreaseTickets(struct thread *td, struct proc *p, int score) {
-
-	//int new_num_tickets = td->tickets - 50*(score);
-	int new_num_tickets = td->tickets - 1;
+sched_decreaseTickets(struct thread *td, int score) {
+	int new_num_tickets = td->tickets - 50*(score);
 	if(new_num_tickets <= 1) {
 		new_num_tickets = 1;
-	} else if(new_num_tickets >= 100000) {
-		new_num_tickets = 100000;
+	} else if(new_num_tickets >= 10000) {
+		new_num_tickets = 10000;
 	}
 	td->tickets = new_num_tickets;
 }
@@ -2064,9 +2056,9 @@ sched_nice(struct proc *p, int nice)
 		sched_priority(td);
 		sched_prio(td, td->td_base_user_pri);
 		if(nice < 0) {
-			sched_increaseTickets(td, p, (100+nice));
+			sched_increaseTickets(td, (100+nice));
 		} else {
-			sched_decreaseTickets(td, p, nice);
+			sched_decreaseTickets(td, nice);
 		}
 		thread_unlock(td);
 	}
