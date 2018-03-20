@@ -1537,7 +1537,11 @@ sched_increaseTickets(struct thread *td, int score) {
 	if (p->total_tickets % p->p_exitthreads != 0) {
 		tickets_per_thread += p->total_tickets % p->p_exitthreads;
 	} */
-	int new_num_tickets = td->tickets + 1;
+	
+	/* don't excede the 100,000 tickets */
+	if ( p->total_tickets + score <= 100000 ) {
+		int new_num_tickets = td->tickets + score;	
+	}
 	if(new_num_tickets <= 1) {
 		new_num_tickets = 1;
 		/* reject the change and re-add the ticket to total */
@@ -1554,7 +1558,11 @@ sched_increaseTickets(struct thread *td, int score) {
 static void
 sched_decreaseTickets(struct thread *td, int score) {
 	struct proc *p = td->td_proc;
-	int new_num_tickets = td->tickets - 1;
+	
+	/* don't go below the 1 ticket */
+	if ( p->total_tickets - score >= 1 ) {
+		int new_num_tickets = td->tickets - score;	
+	}
 	if(new_num_tickets <= 1) {
 		new_num_tickets = 1;
 		/* reject the change and re-add the ticket to total */
