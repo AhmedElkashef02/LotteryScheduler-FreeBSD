@@ -1537,7 +1537,7 @@ sched_increaseTickets(struct thread *td, int score) {
 	/* don't excede the 100,000 tickets */
 	if ( p->total_tickets + score <= 100000 ) {
 		new_num_tickets = td->tickets + score;	
-	} else {
+	} else if ( p->total_tickets + score > 100000 ) {
 		printf("tickets exceeded 100,000 .. sorry\n");
 	}
 	if(new_num_tickets <= 1) {
@@ -1557,7 +1557,7 @@ sched_decreaseTickets(struct thread *td, int score) {
 	/* don't go below the 1 ticket */
 	if ( p->total_tickets - score >= 1 ) {
 		new_num_tickets = td->tickets - score;	
-	} else {
+	} else if ( p->total_tickets - score < 1 ) {
 		printf("tickets can't go below 1 .. sorry\n");
 	}
 	if(new_num_tickets <= 1) {
