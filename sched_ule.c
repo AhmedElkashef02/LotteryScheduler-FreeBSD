@@ -1550,7 +1550,7 @@ sched_increaseTickets(struct proc *p, int score) {
 	// distribute the remaining tickets until they are finished
 	FOREACH_THREAD_IN_PROC(p, td) {
 		thread_lock(td);	
-		if ( td->tickets + remaining_tickets <= 100000 && remaining_tickets < 0) {
+		if ( td->tickets + remaining_tickets <= 100000 && remaining_tickets > 0) {
 			td->tickets += remaining_tickets;
 			remaining_tickets--;
 		}
@@ -1579,7 +1579,7 @@ sched_decreaseTickets(struct proc *p, int score) {
 	// deduct the remaining tickets until they are finished
 	FOREACH_THREAD_IN_PROC(p, td) {
 		thread_lock(td);	
-		if ( td->tickets - remaining_tickets >= 1 && remaining_tickets < 0) {
+		if ( td->tickets - remaining_tickets >= 1 && remaining_tickets > 0) {
 			td->tickets -= remaining_tickets;
 			remaining_tickets--;
 		}
