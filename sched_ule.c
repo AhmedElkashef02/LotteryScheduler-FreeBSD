@@ -1530,13 +1530,12 @@ sched_interact_score(struct thread *td)
 
 //Increases the number of tickets
 static void
-sched_increaseTickets(struct thread *td, int score) {
-	struct proc *p = td->td_proc;
-	int new_num_tickets = td->tickets;
+sched_increaseTickets(struct proc *p, int score) {
+	int new_num_tickets = p->total_tickets;
 	
 	/* don't excede the 100,000 tickets */
 	if ( p->total_tickets + score <= 100000 ) {
-		new_num_tickets = td->tickets + score;	
+		new_num_tickets = p->total_tickets + score;	
 	} else if ( p->total_tickets + score > 100000 ) {
 		printf("tickets exceeded 100,000 .. sorry\n");
 	}
@@ -1545,18 +1544,17 @@ sched_increaseTickets(struct thread *td, int score) {
 	} else if (new_num_tickets >= 100000) {
 		new_num_tickets = 100000;
 	}
-	td->tickets = new_num_tickets;
+	p->total_tickets = new_num_tickets;
 }
 
 //Decreases the number of tickets
 static void
-sched_decreaseTickets(struct thread *td, int score) {
-	struct proc *p = td->td_proc;
-	int new_num_tickets = td->tickets;
+sched_decreaseTickets(struct proc *p, int score) {
+	int new_num_tickets = p->total_tickets;
 	
 	/* don't go below the 1 ticket */
 	if ( p->total_tickets - score >= 1 ) {
-		new_num_tickets = td->tickets - score;	
+		new_num_tickets = p->total_tickets - score;	
 	} else if ( p->total_tickets - score < 1 ) {
 		printf("tickets can't go below 1 .. sorry\n");
 	}
@@ -1565,7 +1563,7 @@ sched_decreaseTickets(struct thread *td, int score) {
 	} else if(new_num_tickets >= 100000) {
 		new_num_tickets = 100000;
 	}
-	td->tickets = new_num_tickets;
+	p->total_tickets = new_num_tickets;
 }
 
 /*
@@ -1601,8 +1599,6 @@ sched_priority(struct thread *td)
 		KASSERT(pri >= PRI_MIN_INTERACT && pri <= PRI_MAX_INTERACT,
 		    ("sched_priority: invalid interactive priority %d score %d",
 		    pri, score));
-		//increase tickets
-		sched_increaseTickets(td, score);
 	} else {
 		pri = SCHED_PRI_MIN;
 		if (td->td_sched->ts_ticks)
