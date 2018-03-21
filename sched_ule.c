@@ -1601,6 +1601,8 @@ sched_priority(struct thread *td)
 		KASSERT(pri >= PRI_MIN_INTERACT && pri <= PRI_MAX_INTERACT,
 		    ("sched_priority: invalid interactive priority %d score %d",
 		    pri, score));
+		//increase tickets
+		sched_increaseTickets(td, score);
 	} else {
 		pri = SCHED_PRI_MIN;
 		if (td->td_sched->ts_ticks)
@@ -2061,22 +2063,22 @@ void
 sched_nice(struct proc *p, int nice)
 {
 	struct thread *td;
+	if (p->p_ucred->cr_uid == 0) {
+		PROC_LOCK_ASSERT(p, MA_OWNED);
 
-	printf("This is the value of nice from inside sched_nice: %d\n",nice);
-	
-	PROC_LOCK_ASSERT(p, MA_OWNED);
-
-	p->p_nice = nice;
-	FOREACH_THREAD_IN_PROC(p, td) {
-		thread_lock(td);
-		sched_priority(td);
-		sched_prio(td, td->td_base_user_pri);
+		p->p_nice = nice;
+		FOREACH_THREAD_IN_PROC(p, td) {
+			thread_lock(td);
+			sched_priority(td);
+			sched_prio(td, td->td_base_user_pri);
+			thread_unlock(td);
+		}	
+	} else {
 		if(nice < 0) {
 			sched_increaseTickets(td, nice);
 		} else {
 			sched_decreaseTickets(td, nice);
 		}
-		thread_unlock(td);
 	}
 }
 
