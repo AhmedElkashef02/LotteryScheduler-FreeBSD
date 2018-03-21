@@ -1,0 +1,6 @@
+#! /bin/sh
+rm /usr/src/sys/kern/sched_ule.c /usr/src/sys/kern/kern_resource.c /usr/src/sys/kern/kern_switch.c /usr/src/sys/sys/runq.h /usr/src/sys/sys/proc.h \
+&& cp sched_ule.c kern_resource.c kern_switch.c /usr/src/sys/kern/ && cp runq.h proc.h /usr/src/sys/sys/ \
+&& rm /usr/src/sys/kern/syscalls.master /usr/src/lib/libc/sys/Symbol.map /sys/conf/files \
+&& cp syscalls.master sys_gift.c /usr/src/sys/kern/ && make sysent -C /usr/src/sys/kern \
+&& cp Symbol.map /usr/src/lib/libc/sys/ && cp files /sys/conf/ \
