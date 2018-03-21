@@ -13,8 +13,7 @@ This basic repository modifies the FreeBSD scheduler to use lottery scheduling r
 
 - `rm /usr/src/sys/kern/syscalls.master /usr/src/lib/libc/sys/Symbol.map /sys/conf/files`
 - Navigate to the cloned directory and open it on terminal.
-- `cp syscalls.master sys_gift.c /usr/src/sys/kern/`
-- `cd /usr/src/sys/kern && make sysent`
+- `cp syscalls.master sys_gift.c /usr/src/sys/kern/ && make -C /usr/src/sys/kern/sysent`
 - Navigate to the cloned directory and open it on terminal.
 - `cp Symbol.map /usr/src/lib/libc/sys/ && cp files /sys/conf/`
 - build & install kernel, then reboot.
