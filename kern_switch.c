@@ -389,6 +389,7 @@ runq_choose_from_lottery(struct runq *rq) {
 	
 	TAILQ_FOREACH(td, rqh, td_runq){
 		if (ticket_counter >= winner)
+			td->tickets--;
 			return (td);
 		ticket_counter += td->tickets;
 	}
