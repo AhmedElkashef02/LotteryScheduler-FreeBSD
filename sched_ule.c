@@ -1601,8 +1601,6 @@ sched_priority(struct thread *td)
 		KASSERT(pri >= PRI_MIN_INTERACT && pri <= PRI_MAX_INTERACT,
 		    ("sched_priority: invalid interactive priority %d score %d",
 		    pri, score));
-		//increase tickets
-		sched_increaseTickets(td, score);
 	} else {
 		pri = SCHED_PRI_MIN;
 		if (td->td_sched->ts_ticks)
