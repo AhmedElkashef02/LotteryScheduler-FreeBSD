@@ -262,29 +262,16 @@ static int
 donice(struct thread *td, struct proc *p, int n)
 {
 	int error;
-
-	sys_getuid(td, 0);
-
-	if (td->td_retval[0] == 0) {
-		PROC_LOCK_ASSERT(p, MA_OWNED);
-		if ((error = p_cansched(td, p)))
-			return (error);
-		if (n > PRIO_MAX)
-			n = PRIO_MAX;
-		if (n < PRIO_MIN)
-			n = PRIO_MIN;
-		if (n < p->p_nice && priv_check(td, 
-PRIV_SCHED_SETPRIORITY) != 0)
-			return (EACCES);
-		sched_nice(p, n);
-	}
-	else {
-	   printf("number of nice BEFORE nice: %d\n", n);
-	   printf("number of tickets BEFORE nice: %d\n", td->tickets);
-	   sched_nice(p, n);
-	   printf("number of nice AFTER nice: %d\n", n);
-	   printf("number of tickets AFTER nice: %d\n", td->tickets);
-	}
+	PROC_LOCK_ASSERT(p, MA_OWNED);
+	if ((error = p_cansched(td, p)))
+		return (error);
+	if (n > PRIO_MAX)
+		n = PRIO_MAX;
+	if (n < PRIO_MIN)
+		n = PRIO_MIN;
+	if (n < p->p_nice && priv_check(td, PRIV_SCHED_SETPRIORITY) != 0)
+		return (EACCES);
+	sched_nice(p, n);
 	return (0);
 }
 
