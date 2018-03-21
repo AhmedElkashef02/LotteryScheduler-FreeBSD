@@ -1531,51 +1531,60 @@ sched_interact_score(struct thread *td)
 //Increases the number of tickets
 static void
 sched_increaseTickets(struct proc *p, int score) {
-	int new_num_tickets = p->total_tickets;
 	/* calculate the tickets per thread */
-	int tickets_per_thread = p->total_tickets / p->p_numthreads;
+	int tickets_per_thread = score / p->p_numthreads;
+	int remaining_tickets = score % p->p_numthreads;
 	 
 	
 	struct thread *td;
+	
+	// distribute the new tickets equally
 	FOREACH_THREAD_IN_PROC(p, td) {
 		thread_lock(td);	
-		if ( td->tickets + score <= 100000 ) {
-				
+		if ( td->tickets + tickets_per_thread <= 100000 ) {
+			td->tickets += tickets_per_thread;
 		}
 		thread_unlock(td);
 	}	
 	
-	/* don't excede the 100,000 tickets */
-	if ( p->total_tickets + score <= 100000 ) {
-		new_num_tickets = p->total_tickets + score;	
-	} else if ( p->total_tickets + score > 100000 ) {
-		printf("tickets exceeded 100,000 .. sorry\n");
+	// distribute the remaining tickets until they are finished
+	FOREACH_THREAD_IN_PROC(p, td) {
+		thread_lock(td);	
+		if ( td->tickets + remaining_tickets <= 100000 && remaining_tickets < 0) {
+			td->tickets += remaining_tickets;
+			remaining_tickets--;
+		}
+		thread_unlock(td);
 	}
-	if(new_num_tickets <= 1) {
-		new_num_tickets = 1;
-	} else if (new_num_tickets >= 100000) {
-		new_num_tickets = 100000;
-	}
-	p->total_tickets = new_num_tickets;
 }
 
 //Decreases the number of tickets
 static void
 sched_decreaseTickets(struct proc *p, int score) {
-	int new_num_tickets = p->total_tickets;
+	/* calculate the tickets per thread */
+	int tickets_per_thread = score / p->p_numthreads;
+	int remaining_tickets = score % p->p_numthreads;
 	
-	/* don't go below the 1 ticket */
-	if ( p->total_tickets - score >= 1 ) {
-		new_num_tickets = p->total_tickets - score;	
-	} else if ( p->total_tickets - score < 1 ) {
-		printf("tickets can't go below 1 .. sorry\n");
+	struct thread *td;
+	
+	// deduct the tickets equally
+	FOREACH_THREAD_IN_PROC(p, td) {
+		thread_lock(td);	
+		if ( td->tickets - tickets_per_thread >= 1 ) {
+			td->tickets -= tickets_per_thread;
+		}
+		thread_unlock(td);
 	}
-	if(new_num_tickets <= 1) {
-		new_num_tickets = 1;
-	} else if(new_num_tickets >= 100000) {
-		new_num_tickets = 100000;
+	
+	// deduct the remaining tickets until they are finished
+	FOREACH_THREAD_IN_PROC(p, td) {
+		thread_lock(td);	
+		if ( td->tickets - remaining_tickets >= 1 && remaining_tickets < 0) {
+			td->tickets -= remaining_tickets;
+			remaining_tickets--;
+		}
+		thread_unlock(td);
 	}
-	p->total_tickets = new_num_tickets;
 }
 
 /*
