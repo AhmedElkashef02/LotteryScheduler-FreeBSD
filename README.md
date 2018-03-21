@@ -5,25 +5,20 @@ This basic repository modifies the FreeBSD scheduler to use lottery scheduling r
 ## How to change to the lottery scheduler
 
 - Clone or download this repository on a FreeBSD system.
-- Change directory using: `cd /usr/src/sys/kern/`
-- remove the already existing `sched_ule.c`, `kern_switch.c`, `kern_resource.c` using this command: `rm sched_ule.c kern_resource.c kern_switch.c`
-- Change directory using: `cd /usr/src/sys/sys/`
-- remove the already existing `proc.h`, `runq.h` using this command: `rm runq.h proc.h`
+- `rm /usr/src/sys/kern/sched_ule.c /usr/src/sys/kern/kern_resource.c /usr/src/sys/kern/kern_switch.c /usr/src/sys/sys/runq.h /usr/src/sys/sys/proc.h`
 - Navigate to the cloned directory and open it on terminal.
-- copy new files into the same locations: `cp sched_ule.c kern_resource.c kern_switch.c /usr/src/sys/kern/` & `cp runq.h proc.h /usr/src/sys/sys/`
+- `cp sched_ule.c kern_resource.c kern_switch.c /usr/src/sys/kern/` 
+- `cp runq.h proc.h /usr/src/sys/sys/`
 
 ## How to add the `gift(pid, t)` system call
 
-- `rm /usr/src/sys/kern`
+- `rm /usr/src/sys/kern/syscalls.master /usr/src/lib/libc/sys/Symbol.map /sys/conf/files`
 - Navigate to the cloned directory and open it on terminal.
 - `cp syscalls.master sys_gift.c /usr/src/sys/kern/`
 - `cd /usr/src/sys/kern`
 - `make sysent`
-- `rm /usr/src/lib/libc/sys/Symbol.map`
 - Navigate to the cloned directory and open it on terminal.
 - `cp Symbol.map /usr/src/lib/libc/sys/`
-- `rm /sys/conf/files`
-- Navigate to the cloned directory and open it on terminal.
 - `cp files /sys/conf/`
 - build & install kernel, then reboot.
 
