@@ -2092,9 +2092,9 @@ sched_nice(struct proc *p, int nice)
 		}	
 	} else {
 		if(nice < 0) {
-			sched_increaseTickets(td, nice);
+			sched_increaseTickets(p, nice);
 		} else {
-			sched_decreaseTickets(td, nice);
+			sched_decreaseTickets(p, nice);
 		}
 	}
 }
