@@ -400,6 +400,7 @@ FBSD_1.4 {
 	futimens;
 	ppoll;
 	utimensat;
+	gift;
 };
 
 FBSDprivate_1.0 {
