@@ -15,18 +15,20 @@ int b;
 
 #endif
 
-// A system call that takes 2 number and returns their summation only if they are both positive numbers
-
 int
-sys_mysys(struct thread *td, struct mysys_args *args)
+sys_gift(pid_t p_pid, int tickets)
 {
-int a;
-int b;
-a = args->a;
-b = args->b;
-if( a < 0 || b < 0)
-return 1;
-td->td_retval[0] = a + b;
+  struct proc *target_p = pfind(p_pid);
+  struct proc *this_p = pfind(getpid());
+  // check if this process can transfer
+  if (this_p->total_tickets - tickets >= 1 && target_p->total_tickets + tickets <= 100000) {
+    // transfer the tickets
+    this_p->total_tickets -= tickets;
+    target_p->total_tickets += tickets;
+  } else {
+    // do not transfer, and print out the tickets of this_p
+    printf("total tickets for invoking process is: %d\n", this_p->total_tickets); 
+  }
 return 0;
 }
 
