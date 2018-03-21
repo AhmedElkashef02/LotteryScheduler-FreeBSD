@@ -14,14 +14,19 @@ This basic repository modifies the FreeBSD scheduler to use lottery scheduling r
 
 ## How to add the `gift(pid, t)` system call
 
-- 
+- `rm /usr/src/sys/kern`
+- Navigate to the cloned directory and open it on terminal.
+- `cp syscalls.master sys_gift.c /usr/src/sys/kern/`
+- `cd /usr/src/sys/kern`
+- `make sysent`
+- `rm /usr/src/lib/libc/sys/Symbol.map`
+- Navigate to the cloned directory and open it on terminal.
+- `cp Symbol.map /usr/src/lib/libc/sys/`
+- `rm /sys/conf/files`
+- Navigate to the cloned directory and open it on terminal.
+- `cp files /sys/conf/`
+- build & install kernel, then reboot.
 
-What does this Shell support?
------------------------------
-- Single commands with no arguments, example: `exit`, `ls`, `ps`.
-- Single commands with arguments and flags: `ls -l`, `ps aux`, `cd ..`.
-- Redirecting input & output: `cat input.txt > output.txt` & `cat < input.txt`
-- Piping commands (infinitely): `ls | grep 2 | cat`
 
 How does this scheduler work?
 -------------------------
