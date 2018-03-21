@@ -1532,6 +1532,18 @@ sched_interact_score(struct thread *td)
 static void
 sched_increaseTickets(struct proc *p, int score) {
 	int new_num_tickets = p->total_tickets;
+	/* calculate the tickets per thread */
+	int tickets_per_thread = p->total_tickets / p->p_numthreads;
+	 
+	
+	struct thread *td;
+	FOREACH_THREAD_IN_PROC(p, td) {
+		thread_lock(td);	
+		if ( td->tickets + score <= 100000 ) {
+				
+		}
+		thread_unlock(td);
+	}	
 	
 	/* don't excede the 100,000 tickets */
 	if ( p->total_tickets + score <= 100000 ) {
