@@ -16,9 +16,10 @@ int b;
 #endif
 
 int
-sys_gift(pid_t p_pid, int tickets)
+sys_gift(int p_pid, int tickets)
 {
-  struct proc *this_p = pfind(getpid()); //1)defines the current process, 2)locks it
+  int PID = getpid();
+  struct proc *this_p = pfind(PID); //1)defines the current process, 2)locks it
   struct thread *td;
   
   printf("before transfer: this process: %d", this_p->total_tickets);
