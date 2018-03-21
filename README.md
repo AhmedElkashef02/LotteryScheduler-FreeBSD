@@ -36,4 +36,12 @@ Current Issues in this lottery scheduler:
 ----------------------------
 - The scheduler does not implement a pool of random numbers and choose from them, it just generates a new random number before it chooses a new winner.
 
+Attributions & Sources:
+----------------------------
+The implementation of this lottery scheduler is inspired by various sources, please check the following links:
+- The work of loug38 in this link: https://github.com/loug38/Lottery-Scheduling-for-freeBSD
+- Geeks For Geeks: https://www.geeksforgeeks.org/operating-system-lottery-scheduling/
+- Wikipedia: https://en.wikipedia.org/wiki/Lottery_scheduling
+- http://pages.cs.wisc.edu/~remzi/OSTEP/cpu-sched-lottery.pdf
+
 Assignment By: Ahmed SalahEldin Farouk Elkashef - 1410216.
