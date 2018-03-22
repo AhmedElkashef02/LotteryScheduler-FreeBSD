@@ -11,11 +11,24 @@
 #include <sys/mutex.h>
 #ifndef _SYS_SYSPROTO_H_
 
+
+struct gift_args{
+int p_pid;
+int tickets;
+};
+
 int
-sys_gift(int p_pid, int tickets)
+sys_gift(struct thread *td, struct mysys_args *args)
 {
-  int PID = getpid();
-  struct proc *this_p = pfind(PID); //1)defines the current process, 2)locks it
+  int p_pid;
+  int tickets;
+  
+  p_pid = args->p_pid;
+  tickets = args->tickets;
+  
+  struct proc *this_p = td->td_proc; //1)defines the current process
+  PROC_LOCK(this_p);
+  
   struct thread *td;
   
   printf("before transfer: this process: %d", this_p->total_tickets);
