@@ -17,7 +17,7 @@ int tickets;
 #endif
 
 int
-sys_gift(struct thread *td, struct mysys_args *args)
+sys_gift(struct thread *td, struct gift_args *args)
 {
   int p_pid;
   int tickets;
