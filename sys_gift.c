@@ -8,13 +8,6 @@
 #include <sys/sysent.h>
 #ifndef _SYS_SYSPROTO_H_
 
-struct mysys_args{
-int a;
-int b;
-};
-
-#endif
-
 int
 sys_gift(int p_pid, int tickets)
 {
