@@ -6,6 +6,9 @@
 #include <sys/kernel.h>
 #include <sys/proc.h>
 #include <sys/sysent.h>
+#include <unistd.h>
+#include <sys/lock.h>
+#include <sys/mutex.h>
 #ifndef _SYS_SYSPROTO_H_
 
 int
