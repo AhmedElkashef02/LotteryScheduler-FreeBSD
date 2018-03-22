@@ -1368,6 +1368,22 @@ sched_pickcpu(struct thread *td, int flags)
 #endif
 
 /*
+ * This function is called every 100 context swithches to update 
+ * the array of random numbers with new random numbers using arc4random.
+ * Because arc4random only returns a 32 bit integer, we bit shift the 
+ * number 32 times to the left then bitwise or the number with another
+ * 32 bit random number.
+*/
+static void tdq_rand(struct tdq *tdq) {
+	for(int i = 0; i < 10; i++) {
+		uint64_t rng = arc4random();
+		uint64_t temp = arc4random();
+		rng = (rng << 32) | temp; 
+		tdq->randoms[i] = rng;
+	}
+}
+
+/*
  * Pick the highest priority task we have and return it.
  */
 static struct thread *
