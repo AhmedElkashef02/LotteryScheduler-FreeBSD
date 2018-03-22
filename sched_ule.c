@@ -517,7 +517,46 @@ tdq_runq_add(struct tdq *tdq, struct thread *td, int flags)
 	* If it's not any of them -> put it in the idle queue.
 	*/
 	else {
-		if (!td->ticketed){
+		/* if interactive */
+		if (pri < PRI_MIN_BATCH) {
+			ts->ts_runq = &tdq->tdq_interactive_user;
+			/* update the total number of tickets for this queue */
+			tdq->tdq_interactive_user.queue_tickets += td->tickets;
+		} 
+		/* if timeshare */
+		else if (pri <= PRI_MAX_BATCH) {
+			if(td->td_proc->p_ucred->cr_ruid != 0) {
+				ts->ts_runq = &tdq->tdq_timeshare_user;
+				tdq->tdq_timeshare_user.queue_tickets += td->tickets;
+			}
+			KASSERT(pri <= PRI_MAX_BATCH && pri >= PRI_MIN_BATCH,
+				("Invalid priority %d on timeshare runq", pri));
+			/*
+			 * This queue contains only priorities between MIN and MAX
+			 * realtime.  Use the whole queue to represent these values.
+			 */
+			if ((flags & (SRQ_BORROWING|SRQ_PREEMPTED)) == 0) {
+				pri = RQ_NQS * (pri - PRI_MIN_BATCH) / PRI_BATCH_RANGE;
+				pri = (pri + tdq->tdq_idx) % RQ_NQS;
+				/*
+				 * This effectively shortens the queue by one so we
+				 * can have a one slot difference between idx and
+				 * ridx while we wait for threads to drain.
+				 */
+				if (tdq->tdq_ridx != tdq->tdq_idx &&
+				    pri == tdq->tdq_ridx)
+					pri = (unsigned char)(pri - 1) % RQ_NQS;
+			} else
+				pri = tdq->tdq_ridx;
+			runq_add_pri(ts->ts_runq, td, pri, flags);
+			return;
+		} 
+		/* if idle */
+		else {
+			ts->ts_runq = &tdq->tdq_idle_user;
+			tdq->tdq_idle_user.queue_tickets += td->tickets;
+		}
+		/* if (!td->ticketed){
 			td->tickets = 500;
 			td->td_proc->total_tickets += 500;
 			td->ticketed = true;
@@ -534,7 +573,7 @@ tdq_runq_add(struct tdq *tdq, struct thread *td, int flags)
 		else {
 			//if idle
 			ts->ts_runq = &tdq->tdq_idle;
-		}
+		} */
 		runq_add(ts->ts_runq, td, flags);
 	}
 }
