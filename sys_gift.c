@@ -8,13 +8,13 @@
 #include <sys/sysent.h>
 #include <sys/lock.h>
 #include <sys/mutex.h>
+
 #ifndef _SYS_SYSPROTO_H_
-
-
 struct gift_args{
 int p_pid;
 int tickets;
 };
+#endif
 
 int
 sys_gift(struct thread *td, struct mysys_args *args)
