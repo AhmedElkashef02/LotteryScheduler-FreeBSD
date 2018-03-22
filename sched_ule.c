@@ -1392,6 +1392,13 @@ tdq_choose(struct tdq *tdq)
 	struct thread *td;
 
 	TDQ_LOCK_ASSERT(tdq, MA_OWNED);
+	/* regenerate new 10 random numbers every 10 scheduling decisions */
+	if(tdq->num_of_decisions == 10) {
+		tdq_rand(tdq);
+		tdq->num_of_decisions = 0;
+	}
+	uint64_t winner = tdq->randoms[tdq->num_of_decisions++];
+	
 	/* choose from realtime threads */
 	td = runq_choose(&tdq->tdq_realtime);
 	if (td != NULL)
@@ -1412,11 +1419,24 @@ tdq_choose(struct tdq *tdq)
 		    td->td_priority));
 		return (td);
 	}
-	/* choose from timeshare threads - lottery */
-	td = runq_choose_from_lottery(&tdq->tdq_timeshare_user);
+	
+	/* ordered from the highest priority to the least */
+	/* choose from interactive threads - lottery */
+	td = runq_choose_from_lottery(&tdq->tdq_interactive_user, winner);
 	if (td != NULL) {
 		return (td);
 	}
+	/* choose from timeshare threads - lottery */
+	td = runq_choose_from_lottery(&tdq->tdq_timeshare_user, winner);
+	if (td != NULL) {
+		return (td);
+	}
+	/* choose from idle threads - lottery */
+	td = runq_choose_from_lottery(&tdq->tdq_idle_user, winner);
+	if (td != NULL) {
+		return (td);
+	}
+	
 	return (NULL);
 }
 
