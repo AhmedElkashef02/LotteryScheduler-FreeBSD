@@ -28,8 +28,6 @@ sys_gift(struct thread *td, struct gift_args *args)
   struct proc *this_p = td->td_proc; //1)defines the current process
   PROC_LOCK(this_p);
   
-  struct thread *td;
-  
   printf("before transfer: this process: %d", this_p->total_tickets);
   
   if(p_pid == 0 && tickets == 0) {
