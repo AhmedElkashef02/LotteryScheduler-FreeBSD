@@ -892,8 +892,8 @@ struct	proc *zpfind(pid_t);		/* Find zombie process by id. */
 int	pget(pid_t pid, int flags, struct proc **pp);
 
 /* add increase/decrease nice functions to header file */
-static void sched_increaseTickets(struct proc *p, int score);
-static void sched_decreaseTickets(struct proc *p, int score);
+void sched_increaseTickets(struct proc *p, int score);
+void sched_decreaseTickets(struct proc *p, int score);
 /* add increase/decrease nice functions to header file */
 
 void	ast(struct trapframe *framep);
