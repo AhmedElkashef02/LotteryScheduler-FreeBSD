@@ -584,6 +584,10 @@ tdq_runq_rem(struct tdq *tdq, struct thread *td)
 		else
 			runq_remove_idx(ts->ts_runq, td, NULL);
 	} else
+		/* if one of the threads is removed, subtract it's tickets from the total tickets of that queue */
+		if(ts->ts_runq == &tdq->tdq_idle_user || ts->ts_runq == &tdq->tdq_timeshare_user || ts->ts_runq == &tdq->tdq_interactive_user) {
+			td->td_sched->ts_runq->queue_tickets -= td->tickets; 
+		}
 		runq_remove(ts->ts_runq, td);
 }
 
