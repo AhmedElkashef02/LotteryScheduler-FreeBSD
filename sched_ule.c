@@ -1546,6 +1546,7 @@ sched_increaseTickets(struct proc *p, int score) {
 		thread_lock(td);	
 		if ( td->tickets + tickets_per_thread <= 100000 ) {
 			td->tickets += tickets_per_thread;
+			p->total_tickets += tickets_per_thread;
 		}
 		thread_unlock(td);
 	}	
@@ -1555,6 +1556,7 @@ sched_increaseTickets(struct proc *p, int score) {
 		thread_lock(td);	
 		if ( td->tickets + remaining_tickets <= 100000 && remaining_tickets > 0) {
 			td->tickets += remaining_tickets;
+			p->total_tickets += remaining_tickets;
 			remaining_tickets--;
 		}
 		thread_unlock(td);
@@ -1586,6 +1588,7 @@ sched_decreaseTickets(struct proc *p, int score) {
 		thread_lock(td);	
 		if ( td->tickets - tickets_per_thread >= 1 ) {
 			td->tickets -= tickets_per_thread;
+			p->total_tickets -= tickets_per_thread;
 		}
 		thread_unlock(td);
 	}
@@ -1595,6 +1598,7 @@ sched_decreaseTickets(struct proc *p, int score) {
 		thread_lock(td);	
 		if ( td->tickets - remaining_tickets >= 1 && remaining_tickets > 0) {
 			td->tickets -= remaining_tickets;
+			p->total_tickets -= remaining_tickets;
 			remaining_tickets--;
 		}
 		thread_unlock(td);
