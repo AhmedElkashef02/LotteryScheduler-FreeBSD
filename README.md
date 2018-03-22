@@ -18,6 +18,10 @@ This basic repository modifies the FreeBSD scheduler to use lottery scheduling r
 - `cp Symbol.map /usr/src/lib/libc/sys/ && cp files /sys/conf/`
 - build & install kernel, then reboot.
 
+## Automated Setup
+- `chmod +x lottery_setup`
+- `./lottery_setup`
+
 
 How does this scheduler work?
 -------------------------
