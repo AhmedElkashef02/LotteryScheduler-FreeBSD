@@ -363,6 +363,7 @@ runq_add_to_lottery(struct runq *rq, struct thread *td) {
 	rqh = &rq->rq_queues[pri];
 	
 	TAILQ_INSERT_TAIL(rqh, td, td_runq);
+	printf("added to lottery schedule, PID: %d\n", td->td_proc->p_pid);
 }
 
 /* choose from lottery scheduler */
