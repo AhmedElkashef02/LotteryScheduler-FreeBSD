@@ -1449,12 +1449,15 @@ tdq_setup(struct tdq *tdq)
 
 	if (bootverbose)
 		printf("ULE: setup cpu %d\n", TDQ_ID(tdq));
+	/* setup for all added user tdqs, random array, and number of scheduling decisions */ 
 	runq_init(&tdq->tdq_realtime);
 	runq_init(&tdq->tdq_interactive_user);
 	runq_init(&tdq->tdq_timeshare);
 	runq_init(&tdq->tdq_timeshare_user);
 	runq_init(&tdq->tdq_idle);
 	runq_init(&tdq->tdq_idle_user);
+	tdq->num_of_decisions = 0;
+	tdq_rand(tdq);
 	snprintf(tdq->tdq_name, sizeof(tdq->tdq_name),
 	    "sched lock %d", (int)TDQ_ID(tdq));
 	mtx_init(&tdq->tdq_lock, tdq->tdq_name, "sched lock",
