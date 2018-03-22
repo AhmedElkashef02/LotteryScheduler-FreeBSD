@@ -517,6 +517,7 @@ tdq_runq_add(struct tdq *tdq, struct thread *td, int flags)
 	else {
 		if (!td->ticketed){
 			td->tickets = 500;
+			td->td_proc->total_tickets += 500;
 			td->ticketed = true;
 		}
 		if (pri < PRI_MIN_BATCH) {
