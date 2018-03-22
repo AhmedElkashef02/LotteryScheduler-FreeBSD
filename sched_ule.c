@@ -517,6 +517,11 @@ tdq_runq_add(struct tdq *tdq, struct thread *td, int flags)
 	* If it's not any of them -> put it in the idle queue.
 	*/
 	else {
+		/* give tickets */
+		if (!td->ticketed){
+			td->tickets = 500;
+			td->ticketed = true;
+		}
 		/* if interactive */
 		if (pri < PRI_MIN_BATCH) {
 			ts->ts_runq = &tdq->tdq_interactive_user;
@@ -556,24 +561,6 @@ tdq_runq_add(struct tdq *tdq, struct thread *td, int flags)
 			ts->ts_runq = &tdq->tdq_idle_user;
 			tdq->tdq_idle_user.queue_tickets += td->tickets;
 		}
-		/* if (!td->ticketed){
-			td->tickets = 500;
-			td->td_proc->total_tickets += 500;
-			td->ticketed = true;
-		}
-		if (pri < PRI_MIN_BATCH) {
-			//if realtime
-			ts->ts_runq = &tdq->tdq_realtime;
-		}else if (pri <= PRI_MAX_BATCH) {
-			//if timeshare
-			ts->ts_runq = &tdq->tdq_timeshare_user;
-			runq_add_to_lottery(ts->ts_runq, td);
-			return;
-			}
-		else {
-			//if idle
-			ts->ts_runq = &tdq->tdq_idle;
-		} */
 		runq_add(ts->ts_runq, td, flags);
 	}
 }
