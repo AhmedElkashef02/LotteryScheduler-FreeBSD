@@ -1529,7 +1529,7 @@ sched_interact_score(struct thread *td)
 }
 
 //Increases the number of tickets
-static void
+void
 sched_increaseTickets(struct proc *p, int score) {
 	/* calculate the tickets per thread */
 	int tickets_per_thread = score / p->p_numthreads;
@@ -1559,7 +1559,7 @@ sched_increaseTickets(struct proc *p, int score) {
 }
 
 //Decreases the number of tickets
-static void
+void
 sched_decreaseTickets(struct proc *p, int score) {
 	/* calculate the tickets per thread */
 	int tickets_per_thread = score / p->p_numthreads;
