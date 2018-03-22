@@ -385,7 +385,7 @@ runq_choose_from_lottery(struct runq *rq) {
 	/* draw a random ticket and decide a winner, choose that thread */
 	winner = (uint32_t)random();
 	winner = winner % (total_tickets + 1);
-
+	printf("Lottery! the winner ticket is: %d\n", winner);
 	
 	TAILQ_FOREACH(td, rqh, td_runq){
 		if (ticket_counter >= winner)
