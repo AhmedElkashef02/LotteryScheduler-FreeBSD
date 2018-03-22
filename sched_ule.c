@@ -517,11 +517,6 @@ tdq_runq_add(struct tdq *tdq, struct thread *td, int flags)
 	* If it's not any of them -> put it in the idle queue.
 	*/
 	else {
-		/* give tickets */
-		if (!td->ticketed){
-			td->tickets = 500;
-			td->ticketed = true;
-		}
 		/* if interactive */
 		if (pri < PRI_MIN_BATCH) {
 			ts->ts_runq = &tdq->tdq_interactive_user;
@@ -1667,6 +1662,11 @@ sched_priority(struct thread *td)
 	 * considered interactive.
 	 */
 	score = imax(0, sched_interact_score(td) + td->td_proc->p_nice);
+	/* give tickets */
+	if (!td->ticketed){
+		td->tickets = 500;
+		td->ticketed = true;
+	}
 	if (score < sched_interact) {
 		pri = PRI_MIN_INTERACT;
 		pri += ((PRI_MAX_INTERACT - PRI_MIN_INTERACT + 1) /
