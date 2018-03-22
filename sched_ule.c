@@ -231,6 +231,8 @@ struct tdq {
 	 * tdq_lock is padded to avoid false sharing with tdq_load and
 	 * tdq_cpu_idle.
 	 */
+	uint64_t randoms[10];			/* array of random numbers */
+	int num_of_decisions;			/* number of scheduling decisions */
 	struct mtx_padalign tdq_lock;		/* run queue lock. */
 	struct cpu_group *tdq_cg;		/* Pointer to cpu topology. */
 	volatile int	tdq_load;		/* Aggregate load. */
@@ -248,7 +250,7 @@ struct tdq {
 	struct runq	tdq_idle;		/* Queue of IDLE threads. */
 	struct runq tdq_interactive_user;	/* Interactive non-root threads */
 	struct runq tdq_timeshare_user;		/* Timeshare non-root threads */
-	struct runq tdq_idle_user;		/* Queue of IDLE non-root threads */
+	struct runq tdq_idle_user;		/* IDLE non-root threads */
 	char		tdq_name[TDQ_NAME_LEN];
 #ifdef KTR
 	char		tdq_loadname[TDQ_LOADNAME_LEN];
