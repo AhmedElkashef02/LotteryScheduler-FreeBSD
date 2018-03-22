@@ -19,8 +19,7 @@ This basic repository modifies the FreeBSD scheduler to use lottery scheduling r
 - build & install kernel, then reboot.
 
 ## Automated Setup
-- `chmod +x lottery_setup`
-- `./lottery_setup`
+- Run the executable file, which will remove and replace the new lottery scheduler and insert the new system call. Use:`./lottery_setup`
 
 
 How does this scheduler work?
