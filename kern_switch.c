@@ -235,7 +235,7 @@ void
 runq_init(struct runq *rq)
 {
 	int i;
-
+	rq->queue_tickets = 0;
 	bzero(rq, sizeof *rq);
 	for (i = 0; i < RQ_NQS; i++)
 		TAILQ_INIT(&rq->rq_queues[i]);
