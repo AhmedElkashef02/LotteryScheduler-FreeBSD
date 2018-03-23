@@ -368,32 +368,31 @@ runq_add_to_lottery(struct runq *rq, struct thread *td) {
 
 /* choose from lottery scheduler */
 struct thread *
-runq_choose_from_lottery(struct runq *rq) {
+runq_choose_from_lottery(struct runq *rq, uint64_t winner) {
+
+	/* if there are no tickets to choose from, return 0 */
+	if(rq->queue_tickets == 0) {
+		return NULL;
+	}
+	
+	int i;
 	struct rqhead *rqh;
 	struct thread *td;
-	int pri = 1;
-	uint32_t winner = 0;
-	uint32_t total_tickets = 0;
-	uint32_t ticket_counter = 0;
+	int winner_num = winner % (rq->queue_tickets);
 
-	rqh = &rq->rq_queues[pri];
-
-	
-	TAILQ_FOREACH(td, rqh, td_runq){
-		total_tickets += td->tickets;
-	}
-
-	/* draw a random ticket and decide a winner, choose that thread */
-	winner = (uint32_t)random();
-	winner = winner % (total_tickets + 1);
-	printf("Lottery! the winner ticket is: %d\n", winner);
-	
-	TAILQ_FOREACH(td, rqh, td_runq){
-		if (ticket_counter >= winner)
-			td->tickets--;
-			td->td_proc->total_tickets--;
-			return (td);
-		ticket_counter += td->tickets;
+	/* loop through the 64 queues */
+	for (i = 0; i < 64; i++) {
+		rqh = &rq->rq_queues[i];
+		if(TAILQ_FIRST(rqh) != NULL) {
+			/* loop through each insider queue from the 64 queues */
+			for(td = TAILQ_FIRST(&rq->rq_queues[index]); td != NULL; td = TAILQ_NEXT(td, td_runq)) {
+				/* keep subtracting tickets from that number until it reaches zero, and choose that thread to run */
+				winner_num = winner_num - td->tickets;
+				if(winner_num <= 0) {
+					return td;
+				}
+			}
+		}
 	}
 	
 	return (NULL);
