@@ -64,7 +64,7 @@ struct runq {
 };
 
 void 	runq_add_to_lottery(struct runq *, struct thread *);
-struct  thread  *runq_choose_from_lottery(struct runq *rq);
+struct  thread  *runq_choose_from_lottery(struct runq *rq, uint64_t winner);
 void	runq_add(struct runq *, struct thread *, int);
 void	runq_add_pri(struct runq *, struct thread *, u_char, int);
 int	runq_check(struct runq *);
