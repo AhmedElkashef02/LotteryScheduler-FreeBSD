@@ -58,6 +58,7 @@ struct rqbits {
  * are placed, and a structure to maintain the status of each queue.
  */
 struct runq {
+	int queue_tickets; /* total tickets for each queue */
 	struct	rqbits rq_status;
 	struct	rqhead rq_queues[RQ_NQS];
 };
