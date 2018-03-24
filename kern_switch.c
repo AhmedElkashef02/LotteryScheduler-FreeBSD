@@ -385,7 +385,7 @@ runq_choose_from_lottery(struct runq *rq, uint64_t winner) {
 		rqh = &rq->rq_queues[i];
 		if(TAILQ_FIRST(rqh) != NULL) {
 			/* loop through each insider queue from the 64 queues */
-			for(td = TAILQ_FIRST(&rq->rq_queues[index]); td != NULL; td = TAILQ_NEXT(td, td_runq)) {
+			for(td = TAILQ_FIRST(&rq->rq_queues[i]); td != NULL; td = TAILQ_NEXT(td, td_runq)) {
 				/* keep subtracting tickets from that number until it reaches zero, and choose that thread to run */
 				winner_num = winner_num - td->tickets;
 				if(winner_num <= 0) {
