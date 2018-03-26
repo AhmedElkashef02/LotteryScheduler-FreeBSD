@@ -26,9 +26,6 @@ How does this scheduler work?
 -------------------------
 A lottery scheduler assigns each process’s threads some number of tickets, then randomly draws a ticket among those allocated to “ready” threads to decide which one to run. That thread is then allowed to run for a set time quantum, during which I/o may occur, or after which it is interrupted by a timer interrupt and this whole procedure is repeated. The number of tickets assigned to each thread determines the likelihood that it’ll run at each scheduling decision, and thus (over the long term) the relative amount of time that it gets to run. Threads that are more likely to get chosen each time will get chosen more often, and thus will get more CPU time.
 
-Current Issues in this lottery scheduler:
-----------------------------
-- The scheduler does not implement a pool of random numbers and choose from them, it just generates a new random number before it chooses a new winner.
 
 Attributions & Sources:
 ----------------------------
