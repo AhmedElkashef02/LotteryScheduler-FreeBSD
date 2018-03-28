@@ -48,7 +48,7 @@ sys_gift(struct thread *td, struct gift_args *args)
       struct proc *target_p = pfind(p_pid);
 	    
       // check if the process is existent
-      if (pfind(target_p) == NULL) {
+      if (pfind(p_pid) == NULL) {
 	PROC_UNLOCK(target_p);
 	PROC_UNLOCK(this_p);
 	td->td_retval[0] = 1;
