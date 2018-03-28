@@ -71,6 +71,8 @@ sys_gift(struct thread *td, struct gift_args *args)
       }
     }
   }
+PROC_UNLOCK(target_p);
+PROC_UNLOCK(this_p);
 return 0;
 }
 
