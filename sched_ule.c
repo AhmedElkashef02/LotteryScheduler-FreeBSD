@@ -2185,13 +2185,10 @@ sched_nice(struct proc *p, int nice)
 		}	
 	} else {
 		if(nice < 0) {
-			printf("increase\n");
 			sched_increaseTickets(p, nice);
 		} else {
-			printf("decrease\n");
 			sched_decreaseTickets(p, nice);
 		}
-		printf("number of total tickets for this process: %d\n", p->total_tickets);
 	}
 }
 
