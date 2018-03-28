@@ -21,6 +21,8 @@ sys_gift(struct thread *td, struct gift_args *args)
 {
   int p_pid;
   int tickets;
+  int total_tickets_per_proc = 0;
+  int total_tickets_per_targ = 0;
   
   p_pid = args->p_pid;
   tickets = args->tickets;
@@ -28,10 +30,17 @@ sys_gift(struct thread *td, struct gift_args *args)
   struct proc *this_p = td->td_proc; //1)defines the current process
   PROC_LOCK(this_p);
   
-  printf("before transfer: this process: %d", this_p->total_tickets);
+  FOREACH_THREAD_IN_PROC(this_p, td) {
+		thread_lock(td);	
+		total_tickets_per_proc += td->tickets;
+		thread_unlock(td);
+	}
   
+  printf("before transfer: this process: %d", total_tickets_per_proc);
+  
+  // if gift(0,0);
   if(p_pid == 0 && tickets == 0) {
-    td->td_retval[0] = this_p->total_tickets;
+    td->td_retval[0] = total_tickets_per_proc;
     PROC_UNLOCK(this_p);
   } else {
     // check that tickets is a valid number
@@ -40,16 +49,24 @@ sys_gift(struct thread *td, struct gift_args *args)
       // check if its a valid process
       if (target_p == NULL) {
         PROC_UNLOCK(target_p);
+        PROC_UNLOCK(this_p);
         td->td_retval[0] = 0;
       } else {
-        printf("before transfer: target process: %d", target_p->total_tickets);
+        // count tickets per target process
+        FOREACH_THREAD_IN_PROC(target_p, td) {
+          thread_lock(td);	
+          total_tickets_per_targ += td->tickets;
+          thread_unlock(td);
+        }
+        
+        printf("before transfer: target process: %d", total_tickets_per_targ);
         // check if this process can transfer
-        if (this_p->total_tickets - tickets >= 1 && target_p->total_tickets + tickets <= 100000) {
+        if (total_tickets_per_proc - tickets >= 1 && total_tickets_per_targ + tickets <= 100000) {
           // transfer the tickets
           sched_increaseTickets(target_p, tickets);
           sched_decreaseTickets(this_p, tickets);
-          printf("after transfer: this process: %d", this_p->total_tickets);
-          printf("after transfer: target process: %d", target_p->total_tickets);
+          printf("after transfer: this process: %d", total_tickets_per_proc);
+          printf("after transfer: target process: %d", total_tickets_per_targ);
         }
       }
     }
