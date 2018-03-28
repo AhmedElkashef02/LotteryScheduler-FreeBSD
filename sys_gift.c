@@ -76,6 +76,21 @@ sys_gift(struct thread *td, struct gift_args *args)
                         // transfer the tickets
                         sched_increaseTickets(target_p, tickets);
                         sched_decreaseTickets(this_p, tickets);
+                        
+                        // recount total tickets for parent process
+                        FOREACH_THREAD_IN_PROC(this_p, td) {
+                                thread_lock(td);
+                                total_tickets_per_targ += td->tickets;
+                                thread_unlock(td);
+                        }
+                        
+                        // recount total tickets for target process
+                        FOREACH_THREAD_IN_PROC(target_p, td) {
+                                thread_lock(td);
+                                total_tickets_per_targ += td->tickets;
+                                thread_unlock(td);
+                        }
+                        
                         printf("after transfer: this process: %d\n", total_tickets_per_proc);
                         printf("after transfer: target process: %d\n", total_tickets_per_targ);
                         PROC_UNLOCK(target_p);
