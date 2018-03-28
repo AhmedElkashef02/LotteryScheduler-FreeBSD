@@ -1,0 +1,11 @@
+Assignment 2 - Design and Implementation of Lottery Scheduler for FreeBSD System
+Assignment By: Ahmed SalahEldin Farouk Elkashef 1410216
+
+General Overview:
+This assignment aims to implement lottery scheduling in FreeBSD that assigns each process’s threads some number of tickets (500), then randomly draws a ticket among those allocated to “ready” threads to decide which one to run. That thread is then allowed to run for a set time quantum, during which I/o may occur, or after which it is interrupted by a timer interrupt and this whole procedure is repeated. The number of tickets assigned to each thread determines the likelihood that it’ll run at each scheduling decision, and thus (over the long term) the relative amount of time that it gets to run. Threads that are more likely to get chosen each time will get chosen more often, and thus will get more CPU time.
+
+Steps to Acheive lottery schduling:
+- initilize each thread with 500 tickets.
+- restrict the number of tickets per thread to not less than 1, and not greater than 100,000 tickets.
+- restrict the number of tickets per process to not less than 1, no maximum specified.
+- 
