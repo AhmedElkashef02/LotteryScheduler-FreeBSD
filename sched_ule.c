@@ -1368,8 +1368,8 @@ sched_pickcpu(struct thread *td, int flags)
 #endif
 
 /*
- * This function is called every 100 context swithches to update 
- * the array of random numbers with new random numbers using arc4random.
+ * This function is called every 10 times the scheduler makes a decision 
+ * to update the array of random numbers with new random numbers using arc4random.
  * Because arc4random only returns a 32 bit integer, we bit shift the 
  * number 32 times to the left then bitwise or the number with another
  * 32 bit random number.
