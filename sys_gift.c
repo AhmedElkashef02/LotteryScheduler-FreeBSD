@@ -35,16 +35,16 @@ sys_gift(struct thread *td, struct gift_args *args)
                 total_tickets_per_proc += td->tickets;
                 thread_unlock(td);
         }
-
-        // check if the owner process is root process
-        if (this_p->p_ucred == 0) {
-                printf("Error(): gift() does not work from a root process.\n");
-                PROC_UNLOCK(this_p);
-                return 0;
-        }
+        
         // if gift(0,0);
         if(p_pid == 0 && tickets == 0) {
                 td->td_retval[0] = total_tickets_per_proc;
+                PROC_UNLOCK(this_p);
+                return 0;
+        }
+        // check if the owner process is root process
+        if (this_p->p_ucred->cr_ruid == 0) {
+                printf("Error(): gift() does not work from a root process.\n");
                 PROC_UNLOCK(this_p);
                 return 0;
         }
@@ -55,6 +55,7 @@ sys_gift(struct thread *td, struct gift_args *args)
                 if (target_p == NULL) {
                         printf("Error(): Target process is not valid.\n");
                         PROC_UNLOCK(this_p);
+                        PROC_UNLOCK(target_p);
                         return 0;
                 }
                 // check if the target process is root process
