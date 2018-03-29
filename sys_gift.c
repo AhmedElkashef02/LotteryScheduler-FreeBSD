@@ -110,8 +110,19 @@ sys_gift(struct thread *td, struct gift_args *args)
                         return 0;
                 }
         } else {
-                // if the tickets are negative
-                printf("Error(): Number of tickets is below zero.\n");
+                // if the tickets are negative: decrease that number from the process tickets
+                printf("before deduction: this process: %d\n", total_tickets_per_proc);
+                sched_increaseTickets(this_p, tickets);
+                
+                // recount total tickets for parent process
+                total_tickets_per_proc = 0;
+                FOREACH_THREAD_IN_PROC(this_p, td) {
+                        thread_lock(td);
+                        total_tickets_per_proc += td->tickets;
+                        thread_unlock(td);
+                }
+                
+                printf("after deduction: this process: %d\n", total_tickets_per_proc);
                 PROC_UNLOCK(this_p);
                 return 0;
         }
