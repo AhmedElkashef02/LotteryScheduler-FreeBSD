@@ -1601,6 +1601,7 @@ sched_increaseTickets(struct proc *p, int score) {
 	/* calculate the tickets per thread */
 	int tickets_per_thread = score / p->p_numthreads;
 	int remaining_tickets = score % p->p_numthreads;
+	int total_tickets = 0;
 	
 	struct thread *td;
 	
@@ -1625,13 +1626,13 @@ sched_increaseTickets(struct proc *p, int score) {
 		thread_unlock(td);
 	}
 	
-	/* testing
-	printf("after distribution:\n");
+	//testing
 	FOREACH_THREAD_IN_PROC(p, td) {
 		thread_lock(td);	
-		printf("total tickets for this thread: %d\n", td->tickets);
+		total_tickets += td->tickets;
 		thread_unlock(td);
-	} */
+	}
+	printf("Total tickets: %d\n", total_tickets);
 }
 
 //Decreases the number of tickets
@@ -1640,6 +1641,7 @@ sched_decreaseTickets(struct proc *p, int score) {
 	/* calculate the tickets per thread */
 	int tickets_per_thread = score / p->p_numthreads;
 	int remaining_tickets = score % p->p_numthreads;
+	int total_tickets = 0;
 	
 	struct thread *td;
 	
@@ -1664,13 +1666,13 @@ sched_decreaseTickets(struct proc *p, int score) {
 		thread_unlock(td);
 	}
 	
-	/* testing
-	printf("after deduction:\n");
+	//testing
 	FOREACH_THREAD_IN_PROC(p, td) {
 		thread_lock(td);	
-		printf("total tickets for this thread: %d\n", td->tickets);
+		total_tickets += td->tickets;
 		thread_unlock(td);
-	} */
+	}
+	printf("Total tickets: %d\n", total_tickets);
 }
 
 /*
@@ -2187,7 +2189,6 @@ sched_nice(struct proc *p, int nice)
 		} else {
 			sched_decreaseTickets(p, nice);
 		}
-		printf("number of total tickets for this process: %d\n", p->total_tickets);
 	}
 }
 
