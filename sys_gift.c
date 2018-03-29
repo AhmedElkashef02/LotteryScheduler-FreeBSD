@@ -78,6 +78,7 @@ sys_gift(struct thread *td, struct gift_args *args)
                         sched_decreaseTickets(this_p, tickets);
                         
                         // recount total tickets for parent process
+                        total_tickets_per_targ = 0;
                         FOREACH_THREAD_IN_PROC(this_p, td) {
                                 thread_lock(td);
                                 total_tickets_per_targ += td->tickets;
@@ -85,6 +86,7 @@ sys_gift(struct thread *td, struct gift_args *args)
                         }
                         
                         // recount total tickets for target process
+                        total_tickets_per_targ = 0;
                         FOREACH_THREAD_IN_PROC(target_p, td) {
                                 thread_lock(td);
                                 total_tickets_per_targ += td->tickets;
