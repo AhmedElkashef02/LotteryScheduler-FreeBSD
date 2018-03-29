@@ -110,46 +110,10 @@ sys_gift(struct thread *td, struct gift_args *args)
                         return 0;
                 }
         } else {
-                // if the tickets are negative: decrease that number from the process tickets
-                struct proc *target_p = pfind(p_pid);
-                // check if its a valid process
-                if (target_p == NULL) {
-                        printf("Error(): Target process is not valid.\n");
-                        PROC_UNLOCK(this_p);
-                        return 0;
-                }
-                // check if the target process is root process
-                if (target_p->p_ucred == 0) {
-                        printf("Error(): Target process is a root process.\n");
-                        PROC_UNLOCK(this_p);
-                        PROC_UNLOCK(target_p);
-                        return 0;
-                }
-                // count tickets per target process
-                FOREACH_THREAD_IN_PROC(target_p, td) {
-                        thread_lock(td);
-                        total_tickets_per_targ += td->tickets;
-                        thread_unlock(td);
-                }
-                // check if this process can be deducted from
-                if (total_tickets_per_targ - tickets >= 1) {
-                        printf("before deduction: target process: %d\n", total_tickets_per_targ);
-                        
-                        sched_decreaseTickets(target_p, tickets);
-                        
-                        // recount total tickets for target process
-                        total_tickets_per_targ = 0;
-                        FOREACH_THREAD_IN_PROC(target_p, td) {
-                                thread_lock(td);
-                                total_tickets_per_targ += td->tickets;
-                                thread_unlock(td);
-                        }
-                        
-                        printf("after deduction: target process: %d\n", total_tickets_per_targ);
-                        PROC_UNLOCK(target_p);
-                        PROC_UNLOCK(this_p);
-                        return 0;
-                }
+                // if the tickets are negative
+                printf("Error(): Number of tickets is below zero.\n");
+                PROC_UNLOCK(this_p);
+                return 0;
         }
         return 0;
 }
