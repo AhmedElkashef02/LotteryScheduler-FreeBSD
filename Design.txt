@@ -8,10 +8,6 @@ Steps to Acheive lottery schduling:
 - Change the mechanism that adds new threads to run queues so that they get chosen randomly, this mechanism only applies for user processes.
 - Change the way a thread is chosen, by producing a new array for each runq with 10 random numbers, those random numbers are updated every 10 shceduling decisions. Thus, we indroduced a new variable "num_sched_decisions" that counts each time a scheduler successfully makes a decision.
 - Add a gift() system call, that takes a target process, and a number of tickets. Deducts those tickets from the calling process, and donates them to the target process. This system call only works when gifting tickets is appliable and does not contradict with any of the restrictions of ticket transfer.
-- initilize each thread with 500 tickets.
-- restrict the number of tickets per thread to not less than 1, and not greater than 100,000 tickets.
-- restrict the number of tickets per process to not less than 1, no maximum specified.
-- determine if a thread should have its tickets increased or decreased depending on its "nice" value.
 - add three new runqs for the user processes that will be dealt with using the lottery scheduling
 - Used the arc4random() pseudo-random number generator, the function is used by the fills up the pool of random number 10 times and gets restarted again to fill new 10 random numbers and replace the existing ones. For more elaboration:
 https://www.freebsd.org/cgi/man.cgi?query=arc4random&sektion=3
@@ -26,4 +22,11 @@ This function utilizes new functions inside of it that do the job:
 tdq_rand: this function populates the pool of random numbers that will be later used to decide which thread to be chosen.
 runq_choose_from_lottery: this function takes that random number from tdq_rand, loops through the 64 insider queues of each runq, subtracts the number of tickets from each thread of those insider queues from that random number, and when the random number finally reaches zero, it picks that thread. Using this method, we can guarantee that the chosen thread is most probably chosen in a random way.
 
-Adding a gift system call - Responsible function: sys_gift.c
+Adding a gift system call - Responsible function: sys_gift.c, syscalls.master, Symbol.map, sys_pipe.c
+Register the new system call in syscalls.master & Symbol.map & sys_pipe.c, then create the function itself in the file sys_gift.c
+
+General restrictions on Ticket transfers and manipulation in Gift(PID,tickets) & nice(tickets):
+- No thread should have more than 100,000 tickets, and no less than 1 ticket
+- determine if a thread should have its tickets increased or decreased depending on its "nice" value. if it's negative, we increase the tickets, if positive, we decrease the tickets.
+- if Gift(0,0) is called, we return the number of tickets for the calling process
+- if Gift(PID, negative number) is called, we decrease the number of tickets from that proccess with ID = PID.
