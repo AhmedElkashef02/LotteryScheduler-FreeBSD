@@ -16,3 +16,14 @@ Steps to Acheive lottery schduling:
 - Used the arc4random() pseudo-random number generator, the function is used by the fills up the pool of random number 10 times and gets restarted again to fill new 10 random numbers and replace the existing ones. For more elaboration:
 https://www.freebsd.org/cgi/man.cgi?query=arc4random&sektion=3
 
+Adding to our new run queues - Resonsible function: tdq_runq_add
+The function is split into two sections that handles the process if it's a root process or a user process
+If root process: it acts the same way
+If user process: it adds gives each thread 500 tickets, sits the flag "ticketed" to true, and decides if it's a timeshare, interactive, or idle. Finally it adds them to our newly created ones.
+
+Choosing from our new run queues - Responsible function: tdq_choose
+This function utilizes new functions inside of it that do the job:
+tdq_rand: this function populates the pool of random numbers that will be later used to decide which thread to be chosen.
+runq_choose_from_lottery: this function takes that random number from tdq_rand, loops through the 64 insider queues of each runq, subtracts the number of tickets from each thread of those insider queues from that random number, and when the random number finally reaches zero, it picks that thread. Using this method, we can guarantee that the chosen thread is most probably chosen in a random way.
+
+Adding a gift system call - Responsible function: sys_gift.c
