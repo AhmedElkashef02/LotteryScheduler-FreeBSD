@@ -97,6 +97,10 @@ sys_gift(struct thread *td, struct gift_args *args)
                         printf("after transfer: target process: %d\n", total_tickets_per_targ);
                         PROC_UNLOCK(target_p);
                         PROC_UNLOCK(this_p);
+                } else {
+                        PROC_UNLOCK(this_p);
+                        PROC_UNLOCK(target_p);
+                        return 0;
                 }
         }
         return 0;
