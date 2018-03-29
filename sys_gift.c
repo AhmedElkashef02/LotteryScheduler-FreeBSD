@@ -38,6 +38,7 @@ sys_gift(struct thread *td, struct gift_args *args)
         
         // if gift(0,0);
         if(p_pid == 0 && tickets == 0) {
+                // unfortunately this piece of code does not work, and I have searched a lot for a solution to it.
                 td->td_retval[0] = total_tickets_per_proc;
                 PROC_UNLOCK(this_p);
                 return 0;
