@@ -2187,6 +2187,7 @@ sched_nice(struct proc *p, int nice)
 		} else {
 			sched_decreaseTickets(p, nice);
 		}
+		printf("number of total tickets for this process: %d\n", p->total_tickets);
 	}
 }
 
