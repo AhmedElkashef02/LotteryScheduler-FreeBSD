@@ -36,10 +36,9 @@ sys_gift(struct thread *td, struct gift_args *args)
                 thread_unlock(td);
         }
 
-        printf("before transfer: this process: %d\n", total_tickets_per_proc);
-
         // check if the owner process is root process
         if (this_p->p_ucred == 0) {
+                printf("Error(): gift() does not work from a root process.\n");
                 PROC_UNLOCK(this_p);
                 return 0;
         }
@@ -54,11 +53,20 @@ sys_gift(struct thread *td, struct gift_args *args)
                 struct proc *target_p = pfind(p_pid);
                 // check if its a valid process
                 if (target_p == NULL) {
+                        printf("Error(): Target process is not valid.\n");
                         PROC_UNLOCK(this_p);
                         return 0;
                 }
                 // check if the target process is root process
                 if (target_p->p_ucred == 0) {
+                        printf("Error(): Target process is a root process.\n");
+                        PROC_UNLOCK(this_p);
+                        PROC_UNLOCK(target_p);
+                        return 0;
+                }
+                // check if the tickets are a negative number
+                if (tickets < 0) {
+                        printf("Error(): Number of tickets is below zero.\n");
                         PROC_UNLOCK(this_p);
                         PROC_UNLOCK(target_p);
                         return 0;
@@ -70,9 +78,12 @@ sys_gift(struct thread *td, struct gift_args *args)
                         thread_unlock(td);
                 }
 
-                printf("before transfer: target process: %d\n", total_tickets_per_targ);
                 // check if this process can transfer
                 if (total_tickets_per_proc - tickets >= 1 && total_tickets_per_targ + tickets <= 100000) {
+                        
+                        printf("before transfer: this process: %d\n", total_tickets_per_proc);
+                        printf("before transfer: target process: %d\n", total_tickets_per_targ);
+                        
                         // transfer the tickets
                         sched_increaseTickets(target_p, tickets);
                         sched_decreaseTickets(this_p, tickets);
@@ -95,9 +106,11 @@ sys_gift(struct thread *td, struct gift_args *args)
                         
                         printf("after transfer: this process: %d\n", total_tickets_per_proc);
                         printf("after transfer: target process: %d\n", total_tickets_per_targ);
+                        
                         PROC_UNLOCK(target_p);
                         PROC_UNLOCK(this_p);
                 } else {
+                        printf("Error(): Ticket transfer is either larger than 100,000 or below 1. Cannot proceed.\n");
                         PROC_UNLOCK(this_p);
                         PROC_UNLOCK(target_p);
                         return 0;
