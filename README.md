@@ -29,7 +29,6 @@ How to test the gift(PID, tickets) system call?
 
 ###Note:
 Calling gift(0,0) will return the number of tickets in the calling process
-Calling gift(PID,tickets) with a negative number of tickets will deduct tickets from that process with ID = PID.
 
 Attributions & Sources:
 ----------------------------
