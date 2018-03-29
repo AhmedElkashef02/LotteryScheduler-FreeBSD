@@ -113,7 +113,6 @@ sys_gift(struct thread *td, struct gift_args *args)
                 // if the tickets are negative
                 printf("Error(): Number of tickets is below zero.\n");
                 PROC_UNLOCK(this_p);
-                PROC_UNLOCK(target_p);
                 return 0;
         }
         return 0;
