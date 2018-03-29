@@ -64,13 +64,6 @@ sys_gift(struct thread *td, struct gift_args *args)
                         PROC_UNLOCK(target_p);
                         return 0;
                 }
-                // check if the tickets are a negative number
-                if (tickets < 0) {
-                        printf("Error(): Number of tickets is below zero.\n");
-                        PROC_UNLOCK(this_p);
-                        PROC_UNLOCK(target_p);
-                        return 0;
-                }
                 // count tickets per target process
                 FOREACH_THREAD_IN_PROC(target_p, td) {
                         thread_lock(td);
@@ -110,11 +103,17 @@ sys_gift(struct thread *td, struct gift_args *args)
                         PROC_UNLOCK(target_p);
                         PROC_UNLOCK(this_p);
                 } else {
-                        printf("Error(): Ticket transfer is either larger than 100,000 or below 1. Cannot proceed.\n");
+                        printf("Error(): Ticket transfer is larger than 100,000. Cannot proceed.\n");
                         PROC_UNLOCK(this_p);
                         PROC_UNLOCK(target_p);
                         return 0;
                 }
+        } else {
+                // if the tickets are negative
+                printf("Error(): Number of tickets is below zero.\n");
+                PROC_UNLOCK(this_p);
+                PROC_UNLOCK(target_p);
+                return 0;
         }
         return 0;
 }
