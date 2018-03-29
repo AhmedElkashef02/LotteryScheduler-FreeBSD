@@ -1600,7 +1600,6 @@ void
 sched_increaseTickets(struct proc *p, int score) {
 	/* calculate the tickets per thread */
 	int tickets_per_thread = score / p->p_numthreads;
-	printf("total threads for this process: %d\n", p->p_numthreads);
 	int remaining_tickets = score % p->p_numthreads;
 	
 	struct thread *td;
@@ -1640,7 +1639,6 @@ void
 sched_decreaseTickets(struct proc *p, int score) {
 	/* calculate the tickets per thread */
 	int tickets_per_thread = score / p->p_numthreads;
-	printf("total threads in this process: %d\n", p->p_numthreads);
 	int remaining_tickets = score % p->p_numthreads;
 	
 	struct thread *td;
