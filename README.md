@@ -27,7 +27,8 @@ How to test the gift(PID, tickets) system call?
 - Enter the corrent PID in the `test-gift.c` compile and run it by `./test-gift`
 - This code uses the gift() system call with 30 tickets, printf statements will be printed showing the number of tickets before and after for the calling and the receiving process.
 
-###Note:
+Note:
+-----
 Calling gift(0,0) will return the number of tickets in the calling process
 
 Attributions & Sources:
