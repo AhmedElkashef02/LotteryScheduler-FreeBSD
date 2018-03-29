@@ -12,4 +12,7 @@ Steps to Acheive lottery schduling:
 - restrict the number of tickets per thread to not less than 1, and not greater than 100,000 tickets.
 - restrict the number of tickets per process to not less than 1, no maximum specified.
 - determine if a thread should have its tickets increased or decreased depending on its "nice" value.
-- 
+- add three new runqs for the user processes that will be dealt with using the lottery scheduling
+- Used the arc4random() pseudo-random number generator, the function is used by the fills up the pool of random number 10 times and gets restarted again to fill new 10 random numbers and replace the existing ones. For more elaboration:
+https://www.freebsd.org/cgi/man.cgi?query=arc4random&sektion=3
+
